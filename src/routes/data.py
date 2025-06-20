@@ -96,4 +96,7 @@ async def process_data(project_id: str, request: ProcessRequest):
         )
     
     return file_chunks
-    
+
+# stateless applications you do not save any data.
+# statefull applications you save data in the database or in the file system.
+
