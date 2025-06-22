@@ -4,7 +4,7 @@ from typing import Optional
 
 class DataChunk(BaseModel):
         
-    _id: Optional[ObjectId]
+    id: Optional[ObjectId] = Field(default=None, alias="_id")
     chunk_text: str = Field(..., min_length=1)
     chunk_meatadata: dict 
     chunk_order: int = Field(..., gt=0)  # Ensures chunk_order is a positive integer
