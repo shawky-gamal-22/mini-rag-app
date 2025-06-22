@@ -22,8 +22,7 @@ class DataController(BaseController):
             return False, ResponseSignal.FILE_SIZE_EXCEEDS_LIMIT
         
         return True, ResponseSignal.FILE_VALIDATED_SUCCESS
-        
-    
+          
     def generate_unique_filepath(self, original_filename: str, project_id: str) -> str:
         """
         Generate a unique filepath for the uploaded file.
