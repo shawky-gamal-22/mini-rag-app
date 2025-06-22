@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, Depends, UploadFile, status
+from fastapi import FastAPI, APIRouter, Depends, UploadFile, status, Request
 from fastapi.responses import JSONResponse
 import os
 from helpers.config import get_settings, Settings
@@ -8,7 +8,9 @@ import aiofiles
 from models import ResponseSignal
 import logging 
 from .schemes.data import ProcessRequest
-
+from models.ProjectModel import ProjectModel
+from models.ChunkModel import ChunkModel
+from models.db_schemes import DataChunk
 
 logger = logging.getLogger("uvicorn.error")
 
@@ -21,9 +23,15 @@ data_router=APIRouter(
 
 
 @data_router.post("/upload/{project_id}")
-async def upload_data(project_id: str, file: UploadFile,
+async def upload_data(request:Request, project_id: str, file: UploadFile,
                       app_settings: Settings = Depends(get_settings)):
-    
+
+    project_model = ProjectModel(request.app.db_client) # get the project model from the request app's db_client
+
+    project = await project_model.get_project_or_create_one(
+        project_id=project_id
+    )
+
     data_controller = DataController()
     
     # valdate the file properties --> it is a logic then we will implement it in the controller folder
@@ -40,12 +48,7 @@ async def upload_data(project_id: str, file: UploadFile,
 
     # get the project path
     project_dir_path = ProjectController().get_project_path(project_id)
-    file_path, file_id = data_controller.generate_unique_filepath(
-        file.filename,
-        project_id
-        )
-
-
+    file_path, file_id = data_controller.generate_unique_filepath(file.filename, project_id)
 
     try:
         async with aiofiles.open(file_path, 'wb') as f:
@@ -68,12 +71,22 @@ async def upload_data(project_id: str, file: UploadFile,
         }
     )
 
-
+# this is the endpoint to process the file and save the chunks to the database
+# it will be called after the file is uploaded successfully
 @data_router.post("/process/{project_id}")
-async def process_data(project_id: str, request: ProcessRequest):
+async def process_data(req:Request,project_id: str, request: ProcessRequest):
     file_id = request.file_id
     chunk_size = request.chunk_size
     overlap_size = request.overlap_size
+    do_reset = request.do_reset
+
+
+    project_model = ProjectModel(req.app.db_client) # get the project model from the request app's db_client
+
+    project = await project_model.get_project_or_create_one(
+        project_id=project_id
+    )
+    
 
     process_controller = ProcessController(project_id)
     file_content = process_controller.get_file_content(file_id)
@@ -95,7 +108,36 @@ async def process_data(project_id: str, request: ProcessRequest):
             }
         )
     
-    return file_chunks
+    # save the chunks to the database
+    file_chunks_records = [
+        DataChunk(
+            chunk_text = chunk.page_content,
+            chunk_meatadata= chunk.metadata,
+            chunk_order = i+1, 
+            chunk_project_id= project.id
+        )
+        for i, chunk in enumerate(file_chunks)
+        ]
+    chunk_model = ChunkModel(req.app.db_client)
+
+
+    if do_reset == 1 :
+        # delete all the chunks for the project if do_reset is set to 1 and if the project exists
+        no_of_deleted_chunks = await chunk_model.delete_chunks_by_project_id(
+            project_id=project.id
+        )
+        logger.info(f"Deleted {no_of_deleted_chunks} chunks for project {project_id}")
+
+    
+    no_of_recoreds = await chunk_model.insert_many_chunks(
+        chunks=file_chunks_records,
+    )
+    return JSONResponse(
+        content={
+            "message": ResponseSignal.PROCESSING_SUCCESS.value,
+            "inserted_chunks": no_of_recoreds
+        }
+    )
 
 # stateless applications you do not save any data.
 # statefull applications you save data in the database or in the file system.
