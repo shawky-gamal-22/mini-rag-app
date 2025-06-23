@@ -26,7 +26,6 @@ class ProjectModel(BaseDataModel):
 
         return instance
     
-    
     async def init_collection(self):
         """
         Initialize the collection by creating indexes.
@@ -53,7 +52,7 @@ class ProjectModel(BaseDataModel):
         """
         result = await self.collection.insert_one(project.dict(by_alias=True, exclude_unset=True)) # insert_one returns an InsertOneResult object and takes a dictionary
         # without await it will return a coroutine object
-        project._id = result.inserted_id # inserted_id is the id of the inserted document
+        project.id = result.inserted_id # inserted_id is the id of the inserted document
         return project
         
     async def get_project_or_create_one(self, project_id: str):
