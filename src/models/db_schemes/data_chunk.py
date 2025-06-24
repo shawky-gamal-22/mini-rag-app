@@ -9,6 +9,7 @@ class DataChunk(BaseModel):
     chunk_meatadata: dict 
     chunk_order: int = Field(..., gt=0)  # Ensures chunk_order is a positive integer
     chunk_project_id: ObjectId
+    chunk_asset_id: Optional[ObjectId] # Optional field for asset ID
 
 
 
