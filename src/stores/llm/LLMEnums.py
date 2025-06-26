@@ -15,3 +15,10 @@ class OpenAIEnum(Enum):
     USER = "user"
     ASSISTANT = "assistant"
 
+class CoHereEnums(Enum):
+    """Enum for OpenAI models."""
+
+    SYSTEM= "SYSTEM"
+    USER = "USER"
+    ASSISTANT = "CHATBOT"
+
