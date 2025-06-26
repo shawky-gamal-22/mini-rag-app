@@ -7,3 +7,11 @@ class LLMEnum(Enum):
     OPENAI = "OPENAI"
     COHERE = "COHERE"
 
+
+class OpenAIEnum(Enum):
+    """Enum for OpenAI models."""
+
+    SYSTEM= "system"
+    USER = "user"
+    ASSISTANT = "assistant"
+
