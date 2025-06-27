@@ -1,5 +1,5 @@
-from ...LLMInterface import LLMInterface
-from ...LLMEnums import CoHereEnums, DocumentTypeEnum
+from ..LLMInterface import LLMInterface
+from ..LLMEnums import CoHereEnums, DocumentTypeEnum
 import cohere 
 import logging
 
@@ -7,12 +7,12 @@ class CohereProvider(LLMInterface):
 
     def __init__(self, api_key: str,
                  default_input_max_characters: int=1000,
-                 default_output_max_characters: int=1000,
+                 default_generation_max_output_tokens: int=1000,
                  default_generation_temperature: float=0.1):
         
         self.api_key = api_key
         self.default_input_max_characters = default_input_max_characters
-        self.default_output_max_characters = default_output_max_characters
+        self.default_generation_max_output_tokens = default_generation_max_output_tokens
         self.default_generation_temperature = default_generation_temperature
         
         self.generation_model_id = None
@@ -68,7 +68,7 @@ class CohereProvider(LLMInterface):
             self.logger.error("Generation model is not set.")
             return None
         
-        max_output_tokens = max_output_tokens if max_output_tokens is not None else self.default_output_max_characters
+        max_output_tokens = max_output_tokens if max_output_tokens is not None else self.default_generation_max_output_tokens
         temperature = temperature if temperature is not None else self.default_generation_temperature
 
         response = self.client.chat(
