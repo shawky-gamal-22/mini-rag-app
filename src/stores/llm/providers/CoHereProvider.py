@@ -1,5 +1,5 @@
 from ..LLMInterface import LLMInterface
-from ..LLMEnums import CohereEnum
+from ..LLMEnums import CoHereEnums, DocumentTypeEnum
 import cohere 
 import logging
 
@@ -83,7 +83,12 @@ class CohereProvider(LLMInterface):
             self.logger.error("Error while generating text with cohere")
             return None
         
-        return response.text
+        generated_text = response.text
+
+        chat_history.append(self.construct_prompt(prompt=prompt,role=CoHereEnums.USER))
+        chat_history.append(self.construct_prompt(prompt=generated_text,role=CoHereEnums.ASSISTANT))
+        
+        return generated_text
 
 
 
@@ -93,3 +98,34 @@ class CohereProvider(LLMInterface):
             "role": role,
             "text": self.process_text(prompt)
         }
+    
+
+    def embed_text(self, text: str, document_type: str= None) -> list:
+        
+        if not self.client:
+            self.logger.error("CoHere client is not initialized.")
+            return None
+
+        if not self.embedding_model_id:
+            self.logger.error("Embedding model is not set.")
+            return None
+        
+        input_type = CoHereEnums.DOCUMENT
+
+        if document_type == DocumentTypeEnum.QUERY:
+            input_type = CoHereEnums.QUERY
+
+        response = self.client.embed(
+            model = self.embedding_model_id,
+            texts = [self.process_text(text)],
+            input_type = input_type,
+            embedding_types = ['float']
+        )
+
+        if not response or not response.embeddings or not response.embeddings.float:
+            self.logger.error("Error while embedding text with Cohere")
+            return None
+        
+        return response.embeddings.float[0]
+
+
