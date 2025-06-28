@@ -7,7 +7,6 @@ class Settings(BaseSettings):
 
     FILE_ALLOWED_TYPES: list[str]
     FILE_MAX_SIZE: int
-
     FILE_DEFAULT_CHUNK_SIZE: int 
 
     MONGODB_URI: str
@@ -28,6 +27,10 @@ class Settings(BaseSettings):
     INPUT_DEFAULT_MAX_CHARACTERS: int = None
     GENERATION_DEFAULT_MAX_TOKENS: int= None
     GENERATION_DEFAULT_TEMPERATURE: float= None
+
+    VECTOR_DB_BACKEND : str
+    VECTOR_DB_PATH : str
+    VECTOR_DB_DISTANT_METHOD : str = None
 
     class Config:
         env_file = ".env"
