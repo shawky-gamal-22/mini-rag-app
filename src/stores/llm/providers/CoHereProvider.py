@@ -22,6 +22,7 @@ class CohereProvider(LLMInterface):
         self.client = cohere.Client(
             api_key=self.api_key
         )
+        self.enums = CoHereEnums
         self.logger = logging.getLogger(__name__)
 
     def set_generation_model(self, model_id: str):
