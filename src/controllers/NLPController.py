@@ -143,7 +143,10 @@ class NLPController(BaseController):
         ]
         document_prompts = "\n".join(document_prompts)
 
-        footer_prompt = self.template_parser.get("rag","footer_prompt")
+
+        footer_prompt = self.template_parser.get("rag","footer_prompt",{
+            "query":query
+        })
 
 
         chat_history = [
