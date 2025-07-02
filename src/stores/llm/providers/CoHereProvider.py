@@ -19,7 +19,7 @@ class CohereProvider(LLMInterface):
         self.embedding_model_id = None
         self.embedding_size = None
 
-        self.client = cohere.Client(
+        self.client = cohere.ClientV2(
             api_key=self.api_key
         )
         self.enums = CoHereEnums
@@ -72,21 +72,20 @@ class CohereProvider(LLMInterface):
         max_output_tokens = max_output_tokens if max_output_tokens is not None else self.default_generation_max_output_tokens
         temperature = temperature if temperature is not None else self.default_generation_temperature
 
+        chat_history.append(self.construct_prompt(prompt=prompt,role=CoHereEnums.USER))
         response = self.client.chat(
             model = self.generation_model_id,
-            chat_history=chat_history,
-            message=self.process_text(prompt),
+            messages=chat_history,
             temperature= temperature,
             max_tokens= max_output_tokens
         )
 
-        if not response or not response.text:
+        if not response or not response.message.content[0].text:
             self.logger.error("Error while generating text with cohere")
             return None
         
-        generated_text = response.text
+        generated_text = response.message.content[0].text
 
-        chat_history.append(self.construct_prompt(prompt=prompt,role=CoHereEnums.USER))
         chat_history.append(self.construct_prompt(prompt=generated_text,role=CoHereEnums.ASSISTANT))
         
         return generated_text
@@ -96,8 +95,8 @@ class CohereProvider(LLMInterface):
     
     def construct_prompt(self, prompt: str, role: str):
         return {
-            "role": role,
-            "text": self.process_text(prompt)
+            "role": role.value if hasattr(role, "value") else role,
+            "content": self.process_text(prompt)
         }
     
 
