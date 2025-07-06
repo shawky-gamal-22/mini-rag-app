@@ -56,9 +56,16 @@ class OpenAIProvider(LLMInterface):
             model = self.generation_model_id,
             messages=chat_history,
             max_tokens=max_output_tokens,
-            temperature=temperature
+            temperature=temperature,
         )
-        if not response or not response.choices or len(response.choices) or not response.choices[0].message == 0:
+        if (
+            not response
+            or not hasattr(response, "choices")
+            or not response.choices
+            or not hasattr(response.choices[0], "message")
+            or not hasattr(response.choices[0].message, "content")
+            or not response.choices[0].message.content
+        ):
             self.logger.error("Failed to generate text.")
             return None
         
