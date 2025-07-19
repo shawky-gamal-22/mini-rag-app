@@ -43,34 +43,31 @@ class ProcessController(BaseController):
         return loader.load() if loader else None
 
 
-    def process_file_content(self, file_content:list, file_id: str,
-                             chunk_size: int = 100, overlap: int = 20):
-        
+    def process_file_content(self, file_content: list, file_id: str,
+                            chunk_size: int=100, overlap_size: int=20):
+
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=chunk_size,
-            chunk_overlap=overlap,
-            length_function=len
+            chunk_overlap=overlap_size,
+            length_function=len,
         )
 
-
         file_content_texts = [
-            doc.page_content 
-            for doc in file_content
+            rec.page_content
+            for rec in file_content
         ]
 
         file_content_metadata = [
-            doc.metadata
-            for doc in file_content
+            rec.metadata
+            for rec in file_content
         ]
 
         chunks = text_splitter.create_documents(
             file_content_texts,
-            metadatas=file_content_metadata,
-            #id=[f"{file_id}_{i}" for i in range(len(file_content_texts))],
+            metadatas=file_content_metadata
         )
 
-        return chunks 
-
+        return chunks
 
 
     
