@@ -46,7 +46,7 @@ class NLPController(BaseController):
 
         # step2: mange items
         texts = [c.chunk_text for c in chunks]
-        metadata = [c.chunk_meatadata for c in chunks]
+        metadata = [c.chunk_metadata for c in chunks]
 
         vectors = [
             self.embedding_client.embed_text(text=text, document_type=DocumentTypeEnum.DOCUMENT.value)
@@ -136,7 +136,7 @@ class NLPController(BaseController):
                 "document_prompt",
                 {
                     "doc_num": i + 1,
-                    "chunk_text": doc.text,
+                    "chunk_text": self.generation_client.process_text(doc.text),
                 }
             )
             for i, doc in enumerate(retrieved_documents)
