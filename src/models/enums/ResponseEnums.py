@@ -3,6 +3,7 @@ from enum import Enum
 class ResponseSignal(Enum):
 
     FILE_TYPE_NOT_ALLOWED = "file type not allowed"
+    FILE_ID_ERROR = "FILE_ID_ERROR_NOT_FOUND"
     FILE_SIZE_EXCEEDS_LIMIT = "file size exceeds the maximum limit"
     FILE_UPLOADED_SUCCESS = "file uploaded successfully"
     FILE_UPLOADED_FAILED = "file upload failed"

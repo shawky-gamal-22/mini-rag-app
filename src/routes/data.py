@@ -100,7 +100,7 @@ async def process_endpoint(request: Request, project_id: int, process_request: P
     project_model = await ProjectModel.create_instance(
         db_client=request.app.db_client
     )
-
+    print("Starting Processing files")
     project = await project_model.get_project_or_create_one(
         project_id=project_id
     )
@@ -161,9 +161,12 @@ async def process_endpoint(request: Request, project_id: int, process_request: P
     no_records = 0
     no_files = 0
 
+    print("Creating instance from chunk MOdel....")
     chunk_model = await ChunkModel.create_instance(
                         db_client=request.app.db_client
                     )
+
+    print("Created instance from chunk MOdel....")
 
     if do_reset == 1:
         collection_name = nlp_controller.create_collection_name(project_id=project.project_id)

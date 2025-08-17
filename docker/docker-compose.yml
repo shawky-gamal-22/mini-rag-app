@@ -18,6 +18,22 @@ services:
     env_file:
       - ./env/.env.app
 
+  
+  frontend:
+    build:
+      context: ..
+      dockerfile: docker/frontend/Dockerfile
+    container_name: frontend
+    ports:
+      - "8501:8501"
+    volumes:
+      - ../streamlit_app:/app
+    restart: unless-stopped
+    networks:
+      - backend
+    depends_on:
+      - fastapi
+
   # Nginx Service
   nginx:
     image: nginx:stable-alpine3.21-perl
