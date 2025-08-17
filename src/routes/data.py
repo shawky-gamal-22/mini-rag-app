@@ -194,6 +194,7 @@ async def process_endpoint(request: Request, project_id: int, process_request: P
             chunk_size=chunk_size,
             overlap_size=overlap_size
         )
+        
 
         if file_chunks is None or len(file_chunks) == 0:
             return JSONResponse(
