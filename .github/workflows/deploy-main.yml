@@ -21,7 +21,7 @@ jobs:
           username: github_user
           key: ${{ secrets.SSH_MAIN_PRIVATE_KEY }}
           script: |
-            cd /home/github_user/workspace/mini-rag
+            cd /home/github_user/workspace/mini-rag/
             git checkout main
             git pull
             sudo systemctl restart minirag.service
