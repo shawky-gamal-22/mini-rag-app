@@ -55,7 +55,8 @@ celery_app = Celery(
     backend=settings.CELERY_RESULT_BACKEND,
     include=[
         "tasks.file_processing",
-        "tasks.data_indexing"
+        "tasks.data_indexing",
+        "tasks.process_workflow"
     ]
 
 )
@@ -83,6 +84,7 @@ celery_app.conf.update(
     task_routes={
         "tasks.file_processing.process_project_files":{"queue":"file_processing"},
         "task.data_indexing.index_data_content":{"queue":"data_indexing"},
+        "tasks.tasks.process_workflow.process_and_push_workflow":{"queue":"file_processing"}
     }
 )
 celery_app.conf.task_default_queue = "default"
