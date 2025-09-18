@@ -114,15 +114,37 @@ class PGVectorProvider(VectorDBInterface):
                     "record_count": record_count.scalar_one(),
                 }
 
-    async def delete_collection(self, collection_name: str):
-        # Logic to delete a collection in PostgreSQL
-        async with self.db_client() as session:
-            async with session.begin():
-                self.logger.info(f"Deleting collection: {collection_name}")
-                delete_sql = sql_text(f'DROP TABLE IF EXISTS {collection_name}')
-                await session.execute(delete_sql)
-                await session.commit()
-        return True
+    async def delete_collection(self, collection_name: str) -> bool:
+        """Safely delete a collection/table.
+        Returns True if the table was deleted, False if it didn't exist."""
+        try:
+            async with self.db_client() as session:
+                async with session.begin():
+                    self.logger.info(f"Deleting collection: {collection_name}")
+
+                    # Check if table exists first
+                    exists_stmt = sql_text("""
+                        SELECT EXISTS (
+                            SELECT 1 FROM information_schema.tables
+                            WHERE table_name = :table_name
+                        )
+                    """)
+                    result = await session.execute(exists_stmt, {"table_name": collection_name})
+                    table_exists = result.scalar()
+
+                    if not table_exists:
+                        self.logger.info(f"Collection {collection_name} does not exist.")
+                        return False
+
+                    # Drop the table safely
+                    drop_stmt = sql_text(f'DROP TABLE "{collection_name}" CASCADE')
+                    await session.execute(drop_stmt)
+
+                    return True
+
+        except Exception as e:
+            self.logger.error(f"Error deleting collection {collection_name}: {str(e)}")
+            raise
 
     async def create_collection(self, collection_name: str,
                           embedding_size: int,
