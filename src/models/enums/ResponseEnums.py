@@ -3,11 +3,13 @@ from enum import Enum
 class ResponseSignal(Enum):
 
     FILE_TYPE_NOT_ALLOWED = "file type not allowed"
+    FILE_ID_ERROR = "FILE_ID_ERROR_NOT_FOUND"
     FILE_SIZE_EXCEEDS_LIMIT = "file size exceeds the maximum limit"
     FILE_UPLOADED_SUCCESS = "file uploaded successfully"
     FILE_UPLOADED_FAILED = "file upload failed"
     FILE_VALIDATED_SUCCESS = "file validated successfully"
     FILE_VALIDATED_FAILED = "file validation failed"
+    FILE_PROCESSING_SUCCESS= "file_processing_success"
     PROCESSING_SUCCESS = "file processed successfully"
     PROCESSING_FAILED = "file processing failed"
     NO_FILES_FOUND="No files found for the project"
@@ -20,3 +22,5 @@ class ResponseSignal(Enum):
     VECTORDB_SEARCH_SUCCESS= "vectordb_search_success"
     RAG_ANSWER_SUCCESS= "rag_answer_succes"
     RAG_ANSWER_ERROR = "rag_answer_errpr"
+    DATA_PUSH_TASK_READY="DATA_PUSH_TASK_READY"
+    PROCESS_AND_PUSH_WORKFLOW_READY="process_and_push_workflow_ready"

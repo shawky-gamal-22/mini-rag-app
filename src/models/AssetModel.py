@@ -66,7 +66,7 @@ class AssetModel(BaseDataModel):
         async with self.db_client() as session:
             stmt = select(Asset).where(
                 Asset.asset_project_id == asset_project_id,
-                Asset.asset_name == asset_name
+                Asset.asset_id == asset_name
             )
             result = await session.execute(stmt)
             records = result.scalar_one_or_none()
