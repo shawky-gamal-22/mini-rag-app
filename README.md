@@ -80,6 +80,31 @@ $ sudo docker compose up -d
 $ uvicorn main:app --reload --host 0.0.0.0 --port 5000
 ```
 
+# Celery (Development Mode)
+
+For development, you can run Celery services manually instead of using Docker:
+
+To Run the **Celery worker**, you need to run the following command in a separate terminal:
+
+```bash
+$ python -m celery -A celery_app worker --queues=default,file_processing,data_indexing --loglevel=info
+```
+
+To run the **Beat scheduler**, you can run the following command in a separate terminal:
+
+```bash
+$ python -m celery -A celery_app beat --loglevel=info
+```
+
+To Run **Flower Dashboard**, you can run the following command in a separate terminal:
+
+```bash
+$ python -m celery -A celery_app flower --conf=flowerconfig.py
+```
+
+
+open your browser and go to `http://localhost:5555` to see the dashboard.
+
 ## POSTMAN Collection
 
 Download the POSTMAN collection from [/assets/mini-rag-app.postman_collection.json](/assets/mini-rag-app.postman_collection.json)
